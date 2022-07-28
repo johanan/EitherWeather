@@ -37,7 +37,7 @@ public class WeatherHandler
         return null;
     }
 
-    public async Task<WeatherForecast> HandleBindAsync(string zipCode)
+    public async Task<Either<Exception, WeatherForecast>> HandleBindAsync(string zipCode)
     {
         return (await NotEmpty(zipCode)
                 .Bind(notEmpty => ValidateZipCode(notEmpty))
@@ -46,10 +46,7 @@ public class WeatherHandler
                     var apiResponse = await _client.GetWeather(_apiKey, validZip);
                     return await apiResponse.Deserialize<WeatherApiData>();
                 }))
-            .Map(WeatherApiData.MapToForecast)
-            .Match(
-                Right: x => x,
-                Left: e => throw e);
+            .Map(WeatherApiData.MapToForecast);
     }
 
     private EitherAsync<Exception, T> CastToAsync<T>(Task<T> source) => source;

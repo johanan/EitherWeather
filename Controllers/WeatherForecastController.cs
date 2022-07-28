@@ -50,16 +50,7 @@ public class WeatherForecastController : ControllerBase
     [HttpGet("WeatherBind/{zipCode}")]
     public async Task<IActionResult> GetWeatherBind([FromRoute] string zipCode, [FromServices] WeatherHandler handler)
     {
-        try
-        {
-            return new OkObjectResult(await handler.HandleBindAsync(zipCode));
-        }
-        catch (Exception e)
-        {
-            var details = new ProblemDetails();
-            details.Extensions.Add("errors", new string[] { e.Message });
-            return new BadRequestObjectResult(details);
-        }
+        return (await handler.HandleBindAsync(zipCode)).ToActionResult();
     }
     
     [HttpGet("WeatherComp/{zipCode}")]
